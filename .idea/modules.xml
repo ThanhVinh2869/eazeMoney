@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Transactions/Transactions.iml" filepath="$PROJECT_DIR$/Transactions/Transactions.iml" />
       <module fileurl="file://$PROJECT_DIR$/eazeMoney.iml" filepath="$PROJECT_DIR$/eazeMoney.iml" />
     </modules>
   </component>
