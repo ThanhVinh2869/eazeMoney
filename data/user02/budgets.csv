@@ -1,0 +1,4 @@
+budgetId,budgetName,budgetAmount,category,budgetPeriod
+b1004,Rent Budget,1200.00,RENT,MONTHLY
+b1005,Entertainment Budget,80.00,ENTERTAINMENT,MONTHLY
+b1006,Food Budget,250.00,FOOD,WEEKLY

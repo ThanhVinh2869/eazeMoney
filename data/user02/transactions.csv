@@ -1,0 +1,6 @@
+transactionId,date,note,category,walletId,amount
+t1006,2026-09-02,Dinner with friends,FOOD,w1003,-32.50
+t1007,2026-09-04,Freelance payment,INCOME,w1004,500.00
+t1008,2026-09-08,Rent payment,RENT,w1004,-1200.00
+t1009,2026-09-12,Movie night,ENTERTAINMENT,w1003,-18.00
+t1010,2026-09-20,Phone bill,UTILITIES,w1004,-40.00
