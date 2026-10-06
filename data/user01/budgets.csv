@@ -1,0 +1,4 @@
+budgetId,budgetName,budgetAmount,category,budgetPeriod
+b1001,Food Budget,300.00,FOOD,MONTHLY
+b1002,Subscriptions Budget,50.00,SUBSCRIPTIONS,MONTHLY
+b1003,Transportation Budget,100.00,TRANSPORTATION,WEEKLY
