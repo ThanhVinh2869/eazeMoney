@@ -10,17 +10,6 @@ public class AccountsManager {
 
     /**
      *
-     */
-    private Account convertCsvToAccount(String line, String delimiter) {
-        String[] fields = line.trim().split(delimiter);
-        if (fields.length != 8) {
-            return null;
-        }
-        return new Account(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], LocalDate.parse(fields[6]), Boolean.parseBoolean(fields[7]));
-    }
-
-    /**
-     *
      * @param accounts
      */
     public AccountsManager(ArrayList<Account> accounts) {
@@ -67,5 +56,16 @@ public class AccountsManager {
      */
     private String convertAccountToCsv(Account account, String delimiter) {
         return account.getUserID() + delimiter + account.getUsername()  + delimiter + account.getPasswordHash() + delimiter + account.getSalt() + delimiter + account.getDisplayName() + delimiter + account.getCurrency() + delimiter + account.getCreatedDate() + delimiter + account.isOnboardingComplete();
+    }
+
+    /**
+     *
+     */
+    private Account convertCsvToAccount(String line, String delimiter) {
+        String[] fields = line.trim().split(delimiter);
+        if (fields.length != 8) {
+            return null;
+        }
+        return new Account(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], LocalDate.parse(fields[6]), Boolean.parseBoolean(fields[7]));
     }
 }
