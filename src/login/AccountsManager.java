@@ -1,19 +1,24 @@
 package login;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class AccountsManager {
 
-    private ArrayList<Account> accounts;
-    private String accountsFileName = "data/accounts.csv";
+    private static final String HEADER = "userId,username,passwordHash,salt,displayName,currency,createdDate,onboardingComplete";
+    private static final String DELIMITER = ",";
 
-    /**
-     *
-     * @param accounts
-     */
-    public AccountsManager(ArrayList<Account> accounts) {
-        this.accounts = accounts;
+    private ArrayList<Account> accounts;
+    private final String accountsFileName = "data/accounts.csv";
+
+    public AccountsManager() throws IOException {
+        this.accounts = new ArrayList<>();
+        loadAccounts();
     }
 
     /**
@@ -24,13 +29,6 @@ public class AccountsManager {
         return accounts;
     }
 
-    /**
-     *
-     * @param accounts
-     */
-    public void setAccounts(ArrayList<Account> accounts) {
-        this.accounts = accounts;
-    }
 
     /**
      *
@@ -42,27 +40,53 @@ public class AccountsManager {
 
     /**
      *
-     * @param accountsFileName
      */
-    public void setAccountsFileName(String accountsFileName) {
-        this.accountsFileName = accountsFileName;
+    private void loadAccounts () throws IOException {
+        try (Scanner scanner = new Scanner(new File(accountsFileName))) {
+            String line;
+            Account account;
+
+            if (scanner.hasNextLine()) {
+                scanner.nextLine(); // skip header row
+            }
+            while (scanner.hasNextLine()) {
+                line = scanner.nextLine();
+                account = convertCsvToAccount(line, DELIMITER);
+                if(account != null) {
+                    accounts.add(account);
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    private void saveAccounts() throws IOException {
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(accountsFileName))){
+            bw.write(HEADER);
+            bw.newLine();
+            for (Account account : accounts) {
+                bw.write(convertAccountToCsv(account, DELIMITER));
+                bw.newLine();
+            }
+        }
     }
 
     /**
      *
      * @param account
-     * @param delimiter
      * @return
      */
-    private String convertAccountToCsv(Account account, String delimiter) {
-        return account.getUserID() + delimiter + account.getUsername()  + delimiter + account.getPasswordHash() + delimiter + account.getSalt() + delimiter + account.getDisplayName() + delimiter + account.getCurrency() + delimiter + account.getCreatedDate() + delimiter + account.isOnboardingComplete();
+    private String convertAccountToCsv(Account account,  String delimiter) {
+        return account.getUserID() + DELIMITER + account.getUsername()  + DELIMITER + account.getPasswordHash() + DELIMITER + account.getSalt() + DELIMITER + account.getDisplayName() + DELIMITER + account.getCurrency() + DELIMITER + account.getCreatedDate() + DELIMITER + account.isOnboardingComplete();
     }
 
     /**
      *
      */
     private Account convertCsvToAccount(String line, String delimiter) {
-        String[] fields = line.trim().split(delimiter);
+        String[] fields = line.trim().split(DELIMITER);
         if (fields.length != 8) {
             return null;
         }
