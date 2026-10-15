@@ -13,6 +13,7 @@ import java.util.Scanner;
  */
 public class AccountsManager {
 
+    private static final String DEFAULT_CURRENCY = "USD";
     private static final String HEADER = "userId,username,passwordHash,salt,displayName,currency,createdDate,onboardingComplete";
     private static final String DELIMITER = ",";
 
@@ -97,11 +98,16 @@ public class AccountsManager {
     }
 
     /**
+     * ACTION METHODS
+     */
+
+
+    /**
      *
      */
     public Account findByUsername(String username){
         for (Account a : accounts) {
-            if (a.getUsername().equals(username)) {
+            if (a.getUsername().equalsIgnoreCase(username)) {
                 return a;
             }
         }
@@ -113,7 +119,7 @@ public class AccountsManager {
      */
     public boolean isAccountExist(String username){
         for (Account a : accounts) {
-            if (a.getUsername().equals(username)) {
+            if (a.getUsername().equalsIgnoreCase(username)) {
                 return true;
             }
         }
@@ -138,8 +144,34 @@ public class AccountsManager {
     /**
      *
      */
-    public Account regiserAccount(String username, String password, String displayName, String currency) throws IOException{
+    public Account registerAccount(String username, String password, String confirmedPassword, String displayName) throws IOException, IllegalArgumentException {
+        InputValidator.checkUsername(username);
+        InputValidator.checkPassword(password, confirmedPassword);
+        InputValidator.checkDisplayName(displayName);
+
+        String uname = username.trim();
+        String disName = displayName.trim();
+
+        if(isAccountExist(username))
+            throw new IllegalArgumentException("This username is already taken.");
+
+        String userId = generateNewUserId();
+
+        String passwordHash = password;
+        String salt = "SH123";
+
+        Account account = new Account(userId, uname, passwordHash, salt, disName, "USD", LocalDate.now(), false);
         accounts.add(account);
         saveAccounts();
+
+        createUserDataFolder(userId);
+
+        return account;
     }
+
+    //TO DO: a method to generate Id
+    private String generateNewUserID(){}
+
+    //TO DO: a method to creata new folder for new user
+    private void createUserDataFolder(String userId) throws IOException {}
 }
