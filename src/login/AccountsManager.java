@@ -8,6 +8,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ *
+ */
 public class AccountsManager {
 
     private static final String HEADER = "userId,username,passwordHash,salt,displayName,currency,createdDate,onboardingComplete";
@@ -91,5 +94,52 @@ public class AccountsManager {
             return null;
         }
         return new Account(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], LocalDate.parse(fields[6]), Boolean.parseBoolean(fields[7]));
+    }
+
+    /**
+     *
+     */
+    public Account findByUsername(String username){
+        for (Account a : accounts) {
+            if (a.getUsername().equals(username)) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    /**
+     *
+     */
+    public boolean isAccountExist(String username){
+        for (Account a : accounts) {
+            if (a.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     */
+    public Account authenticate(String username, String password){
+        Account account = findByUsername(username);
+
+        if(account == null || password == null)
+            return null;
+
+        if(account.getPasswordHash().equals(password))
+            return account;
+
+        return null;
+    }
+
+    /**
+     *
+     */
+    public Account regiserAccount(String username, String password, String displayName, String currency) throws IOException{
+        accounts.add(account);
+        saveAccounts();
     }
 }
