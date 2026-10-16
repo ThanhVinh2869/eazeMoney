@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -135,7 +137,7 @@ public class AccountsManager {
         if(account == null || password == null)
             return null;
 
-        if(account.getPasswordHash().equals(password))
+        if(PasswordHasher.verifyPassword(password, account.getSalt(), account.getPasswordHash()))
             return account;
 
         return null;
@@ -152,15 +154,15 @@ public class AccountsManager {
         String uname = username.trim();
         String disName = displayName.trim();
 
-        if(isAccountExist(username))
+        if(isAccountExist(uname))
             throw new IllegalArgumentException("This username is already taken.");
 
         String userId = generateNewUserId();
 
-        String passwordHash = password;
-        String salt = "SH123";
+        String salt = PasswordHasher.generateSalt();
+        String passwordHash = PasswordHasher.hashPassword(password, salt);
 
-        Account account = new Account(userId, uname, passwordHash, salt, disName, "USD", LocalDate.now(), false);
+        Account account = new Account(userId, uname, passwordHash, salt, disName, DEFAULT_CURRENCY, LocalDate.now(), false);
         accounts.add(account);
         saveAccounts();
 
@@ -169,9 +171,32 @@ public class AccountsManager {
         return account;
     }
 
-    //TO DO: a method to generate Id
-    private String generateNewUserID(){}
+    /**
+     * Creates the next free user id
+     * @return a new user id that no account uses yet
+     */
+    private String generateNewUserId() {
+        int max = 1000;
+        for (Account a : accounts) {
+            int number = Integer.parseInt(a.getUserID().substring(1)); // "u1002" -> 1002
+            max = Math.max(max, number);
+        }
+        return "u" + (max + 1);
+    }
 
-    //TO DO: a method to creata new folder for new user
-    private void createUserDataFolder(String userId) throws IOException {}
+    /**
+     * Creates data/userId/ with empty wallets, transactions and budgets CSV files (header row only).
+     * @param userId the id of the new user
+     * @throws IOException if the folder or files cannot be created
+     */
+    private void createUserDataFolder(String userId) throws IOException {
+        Path folder = Path.of("data", userId);
+        Files.createDirectories(folder);
+        Files.writeString(folder.resolve("wallets.csv"),
+                "walletId,walletName,startingBalance" + System.lineSeparator());
+        Files.writeString(folder.resolve("transactions.csv"),
+                "transactionId,date,note,category,walletId,amount" + System.lineSeparator());
+        Files.writeString(folder.resolve("budgets.csv"),
+                "budgetId,budgetName,budgetAmount,category,budgetPeriod" + System.lineSeparator());
+    }
 }
