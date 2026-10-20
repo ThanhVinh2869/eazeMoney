@@ -1,4 +1,3 @@
-
 package transactions;
 
 import java.util.ArrayList;
@@ -11,12 +10,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.nio.charset.StandardCharsets;
 
-
 public class TransactionList {
-
     private ArrayList<Transaction> transactions;
-
-
     private Path filePath;
 
     public TransactionList(String userId) {
@@ -25,18 +20,18 @@ public class TransactionList {
         filePath = Paths.get("data", userId, "transactions.csv");
     }
 
-
     public TransactionList(Path filePath) {
         transactions = new ArrayList<>();
         this.filePath = filePath;
     }
 
+
+    // -----------CRUD Operations-----------
+
     // CREATE: Add a new transaction
     public boolean addTransaction(Transaction transaction) {
-
         // Check whether the transaction ID already exists
         for (Transaction existing : transactions) {
-
             if (existing.getTransactionId().equals(transaction.getTransactionId())) {
                 return false;
             }
@@ -47,23 +42,17 @@ public class TransactionList {
         return true;
     }
 
-
     // READ:Retrieve all transactions
     public ArrayList<Transaction> getTransactions() {
         return new ArrayList<>(transactions);
     }
 
-
     // UPDATE: Replace an existing transaction
-    public boolean updateTransaction(String transactionId,
-                                     Transaction updatedTransaction) {
-
+    public boolean updateTransaction(String transactionId, Transaction updatedTransaction) {
         for (int i = 0; i < transactions.size(); i++) {
-
             Transaction current = transactions.get(i);
 
             if (current.getTransactionId().equals(transactionId)) {
-
                 if (!updatedTransaction.getTransactionId().equals(transactionId)) {
                     return false;
                 }
@@ -78,9 +67,7 @@ public class TransactionList {
 
     // DELETE: Remove a transaction using its ID
     public boolean deleteTransaction(String transactionId) {
-
         for (int i = 0; i < transactions.size(); i++) {
-
             Transaction current = transactions.get(i);
 
             if (current.getTransactionId().equals(transactionId)) {
@@ -92,13 +79,14 @@ public class TransactionList {
         return false;
     }
 
+
+    // -----------Filter methods-----------
+
     // Find transactions by category
     public ArrayList<Transaction> findByCategory(String category) {
-
         ArrayList<Transaction> results = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
-
             if (transaction.getCategory().equalsIgnoreCase(category)) {
                 results.add(transaction);
             }
@@ -109,11 +97,9 @@ public class TransactionList {
 
     // Find transactions by wallet ID
     public ArrayList<Transaction> findByWallet(String walletId) {
-
         ArrayList<Transaction> results = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
-
             if (transaction.getWalletId().equals(walletId)) {
                 results.add(transaction);
             }
@@ -123,13 +109,10 @@ public class TransactionList {
     }
 
     // Find transactions within a date range
-    public ArrayList<Transaction> findByDateRange(
-            LocalDate start, LocalDate end) {
-
+    public ArrayList<Transaction> findByDateRange(LocalDate start, LocalDate end) {
         ArrayList<Transaction> results = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
-
             LocalDate date = transaction.getDate();
 
             if (!date.isBefore(start) && !date.isAfter(end)) {
@@ -140,8 +123,9 @@ public class TransactionList {
         return results;
     }
 
-    public void loadTransactions() throws IOException {
 
+    // -----------CSV IO Handling-----------
+    public void loadTransactions() throws IOException {
         ArrayList<Transaction> loaded = new ArrayList<>();
 
         if (!Files.exists(filePath)) {
@@ -219,13 +203,11 @@ public class TransactionList {
     }
 
     private String[] parseCsvLine(String line) {
-
         List<String> values = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean insideQuotes = false;
 
         for (int i = 0; i < line.length(); i++) {
-
             char c = line.charAt(i);
 
             if (c == '"') {
@@ -248,8 +230,6 @@ public class TransactionList {
         }
 
         values.add(current.toString());
-
         return values.toArray(new String[0]);
     }
-
 }
