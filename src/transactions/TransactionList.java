@@ -31,12 +31,22 @@ public class TransactionList {
         this.filePath = filePath;
     }
 
+    // CREATE: Add a new transaction
+    public boolean addTransaction(Transaction transaction) {
 
+        // Check whether the transaction ID already exists
+        for (Transaction existing : transactions) {
 
-    // CREATE:Add a new transaction
-    public void addTransaction(Transaction transaction) {
+            if (existing.getTransactionId().equals(transaction.getTransactionId())) {
+                return false;
+            }
+        }
+
+        // Only add the transaction if its ID is unique
         transactions.add(transaction);
+        return true;
     }
+
 
     // READ:Retrieve all transactions
     public ArrayList<Transaction> getTransactions() {
@@ -135,7 +145,7 @@ public class TransactionList {
         ArrayList<Transaction> loaded = new ArrayList<>();
 
         if (!Files.exists(filePath)) {
-            throw new IOException("Transaction file not found: " + filePath);
+            return;
         }
 
         // Read all lines from the CSV file
@@ -192,7 +202,10 @@ public class TransactionList {
             lines.add(line);
         }
 
-        // Write all rows to the CSV file
+
+        //Create the users folder if it doesn't exist
+        Files.createDirectories(filePath.getParent());
+        // Write all rows/transactions to the CSV file
         Files.write(filePath, lines, StandardCharsets.UTF_8);
     }
 
