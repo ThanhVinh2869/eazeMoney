@@ -42,41 +42,36 @@ public class TransactionList {
         return true;
     }
 
-    // READ:Retrieve all transactions
+    // READ: Retrieve all transactions or one
     public ArrayList<Transaction> getTransactions() {
         return new ArrayList<>(transactions);
     }
 
-    // UPDATE: Replace an existing transaction
-    public boolean updateTransaction(String transactionId, Transaction updatedTransaction) {
-        for (int i = 0; i < transactions.size(); i++) {
-            Transaction current = transactions.get(i);
-
-            if (current.getTransactionId().equals(transactionId)) {
-                if (!updatedTransaction.getTransactionId().equals(transactionId)) {
-                    return false;
-                }
-
-                transactions.set(i, updatedTransaction);
-                return true;
+    public Transaction findTransactionById(String id) {
+        for (Transaction transaction : transactions) {
+            if (transaction.getTransactionId().equals(id)) {
+                return transaction;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    // UPDATE: Replace an existing transaction
+    public boolean updateTransaction(String transactionId, Transaction updatedTransaction) {
+        Transaction current = findTransactionById(transactionId);
+        if (current == null || !updatedTransaction.getTransactionId().equals(transactionId)) {
+            return false;
+        }
+
+        transactions.set(transactions.indexOf(current), updatedTransaction);
+        return true;
     }
 
     // DELETE: Remove a transaction using its ID
     public boolean deleteTransaction(String transactionId) {
-        for (int i = 0; i < transactions.size(); i++) {
-            Transaction current = transactions.get(i);
-
-            if (current.getTransactionId().equals(transactionId)) {
-                transactions.remove(i);
-                return true;
-            }
-        }
-
-        return false;
+        Transaction transaction = findTransactionById(transactionId);
+        return transaction != null && transactions.remove(transaction);
     }
 
 
