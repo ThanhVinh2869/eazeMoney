@@ -1,4 +1,5 @@
-package dashboard;
+package menu;
 
 public class DashboardMenu {
+
 }

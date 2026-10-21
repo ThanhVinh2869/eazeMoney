@@ -1,5 +1,6 @@
 package util;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
@@ -11,7 +12,8 @@ public class InputReader {
         this.scanner = scanner;
     }
 
-    public int readInt() {
+    public int readInt(String prompt) {
+        System.out.print(prompt);
         while (true) {
             try {
                 return Integer.parseInt(scanner.nextLine().trim());
@@ -21,16 +23,42 @@ public class InputReader {
         }
     }
 
-    public int readChoice() {
-        // TODO
-        return -1;
+    public static boolean isNumberBetween(short number, short from, short to) {
+        return (number >= from && number <= to);
     }
 
-    public String readString() {
-        return scanner.nextLine();
+    public static boolean isNumberBetween(int number , int from, int to) {
+        return (number >= from && number <= to);
     }
 
-    public LocalDate readDate() {
+    public static boolean isNumberBetween(float number, float from, float to) {
+        return (number >= from && number <= to);
+    }
+
+    public static boolean isNumberBetween(double number, double from, double to) {
+        return (number >= from && number <= to);
+    }
+
+    public int readIntNumberBetween(String prompt, int from, int to) {
+        int number = readInt(prompt);
+
+        while (!isNumberBetween(number, from, to)) {
+            System.out.println("Invalid choice, please try again.");
+            number = readInt(prompt);
+        }
+        return number;
+    }
+
+    public String readString(String prompt) {
+        System.out.print(prompt);
+        if (!scanner.hasNextLine()) {
+            return null;
+        }
+        return scanner.nextLine().trim();
+    }
+
+    public LocalDate readDate(String prompt) {
+        System.out.print(prompt);
         while (true) {
             try {
                 return LocalDate.parse(scanner.nextLine().trim());
@@ -51,6 +79,20 @@ public class InputReader {
         }
     }
 
+    public BigDecimal readBigDecimal() {
+        while (true) {
+            String value = readString("Amount: ");
+            if (value == null) {
+                return null;
+            }
+            try {
+                return new BigDecimal(value);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid amount.");
+            }
+        }
+    }
+
     public double readPositiveDouble() {
         while (true) {
             double value = readDouble();
@@ -63,8 +105,7 @@ public class InputReader {
 
     public boolean confirm(String question) {
         while (true) {
-            System.out.print(question + " (y/n): ");
-            String answer = readString().toLowerCase();
+            String answer = readString(question + " (y/n): ").toLowerCase();
 
             if (answer.equals("y") || answer.equals("yes")) {
                 return true;
