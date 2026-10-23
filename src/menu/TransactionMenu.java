@@ -113,24 +113,25 @@ public class TransactionMenu extends Menu {
 
     // -----------Handle Menu Options-----------
     public void handleDisplayTransactions(List<Transaction> transactions) {
-        System.out.println("\n===== ALL TRANSACTIONS =====");
+        System.out.println("\n===== TRANSACTIONS =====");
 
         if (transactions.isEmpty()) {
             System.out.println("No transactions found.");
             return;
         }
 
-        System.out.printf("%-12s %-12s %-20s %-15s %12s%n",
-                "ID", "DATE", "NOTE", "CATEGORY", "AMOUNT");
+        System.out.printf("%-12s %-12s %-20s %-15s %-12s %12s%n",
+                "ID", "DATE", "NOTE", "CATEGORY", "WALLET ID", "AMOUNT");
 
-        System.out.println("--------------------------------------------------------------");
+        System.out.println("-------------------------------------------------------------------------------------------------");
 
         for (Transaction transaction : transactions) {
-            System.out.printf("%-12s %-12s %-20.20s %-15s %12s%n",
+            System.out.printf("%-12s %-12s %-20.20s %-15s %-12s %12s%n",
                     transaction.getTransactionId(),
                     transaction.getDate(),
                     transaction.getNote(),
                     transaction.getCategory(),
+                    transaction.getWalletId(),
                     transaction.getAmount());
         }
     }
