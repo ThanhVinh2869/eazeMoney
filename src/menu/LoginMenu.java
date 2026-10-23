@@ -2,7 +2,7 @@ package menu;
 
 import login.Account;
 import login.AccountsManager;
-import login.InputValidator;
+import util.InputValidator;
 
 import java.io.IOException;
 import java.util.List;
