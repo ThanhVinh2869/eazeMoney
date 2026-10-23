@@ -1,6 +1,7 @@
 package menu;
 import transactions.Transaction;
 import transactions.TransactionList;
+import wallet.WalletList;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,12 +11,15 @@ import java.util.Scanner;
 
 public class TransactionMenu extends Menu {
     private TransactionList transactionList;
+    private final WalletList walletList;
 
 
     public TransactionMenu(Scanner scanner, String userId) throws IOException {
         super(scanner);
         this.transactionList = new TransactionList(userId);
         this.transactionList.loadTransactions();
+        this.walletList = new WalletList();
+        this.walletList.loadWallets(userId);
     }
 
     public TransactionList getTransactionList(){
@@ -60,7 +64,7 @@ public class TransactionMenu extends Menu {
                     LocalDate endDate = reader.readDate("End date (YYYY-MM-DD): ");
                     if (endDate != null) {
                         if (endDate.isBefore(startDate)) {
-                            System.out.println("End date must not be before start date.");
+                            System.out.println("[!] End date must not be before start date.");
                         } else {
                             handleDisplayByDateRange(startDate, endDate);
                         }
@@ -74,8 +78,7 @@ public class TransactionMenu extends Menu {
                     try {
                         handleAddTransaction(transaction);
                     } catch (IOException e) {
-                        // TODO
-                        System.out.println("Please fix this: " + e.getMessage());
+                        System.out.println("[!] IO Error: " + e.getMessage());
                     }
                 }
                 break;
@@ -87,14 +90,16 @@ public class TransactionMenu extends Menu {
                     Transaction toBeUpdatedTransaction = transactionList.findTransactionById(transactionId);
                     if (toBeUpdatedTransaction != null) {
                         try {
-                            handleUpdateTransaction(transactionId, readTransaction(transactionId));
+                            Transaction newTransaction = readTransaction(transactionId);
+                            handleUpdateTransaction(transactionId, newTransaction);
                         } catch (IOException e) {
-                            // TODO
-                            System.out.println("Please fix this: " + e.getMessage());
+                            System.out.println("[!] IO Error: " + e.getMessage());
+                        } catch (NullPointerException e) {
+                            System.out.println("[!] Fail to update transaction. Please try again!");
                         }
                     }
                     else {
-                        System.out.println("Transaction ID not found.");
+                        System.out.println("[!] Transaction ID not found.");
                     }
                 }
                 break;
@@ -106,8 +111,7 @@ public class TransactionMenu extends Menu {
                     try {
                         handleDeleteTransaction(transactionId);
                     } catch (IOException e) {
-                        // TODO
-                        System.out.println("Please fix this: " + e.getMessage());
+                        System.out.println("[!] IO Error: " + e.getMessage());
                     }
                 }
                 break;
@@ -121,7 +125,7 @@ public class TransactionMenu extends Menu {
         System.out.println("\n===== TRANSACTIONS =====");
 
         if (transactions.isEmpty()) {
-            System.out.println("No transactions found.");
+            System.out.println("[!] No transactions found.");
             return;
         }
 
@@ -169,7 +173,7 @@ public class TransactionMenu extends Menu {
             transactionList.saveTransactions();
             System.out.println("Transaction added successfully!");
         } else {
-            System.out.println("Transaction ID already exists!");
+            System.out.println("[!] Transaction ID already exists!"); // this should never be reached
         }
     }
 
@@ -181,7 +185,7 @@ public class TransactionMenu extends Menu {
             transactionList.saveTransactions();
             System.out.println("Transaction updated successfully!");
         } else {
-            System.out.println("Transaction not found.");
+            System.out.println("[!] Transaction not found.");
         }
     }
 
@@ -193,7 +197,7 @@ public class TransactionMenu extends Menu {
             transactionList.saveTransactions();
             System.out.println("Transaction deleted successfully!");
         } else {
-            System.out.println("Transaction not found.");
+            System.out.println("[!] Transaction not found.");
         }
     }
 
@@ -213,6 +217,10 @@ public class TransactionMenu extends Menu {
         }
         String walletId = reader.readString("Wallet ID: ");
         if (walletId == null) {
+            return null;
+        }
+        if (!walletList.isWalletExists(walletId)) {
+            System.out.println("[!] Wallet ID does not exist for this user.");
             return null;
         }
         BigDecimal amount = reader.readBigDecimal();
