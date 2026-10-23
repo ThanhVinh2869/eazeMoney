@@ -91,6 +91,9 @@ public class TransactionMenu extends Menu {
                             System.out.println("Please fix this: " + e.getMessage());
                         }
                     }
+                    else {
+                        System.out.println("Transaction ID not found.");
+                    }
                 }
                 break;
             case 7:
