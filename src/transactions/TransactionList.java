@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.nio.charset.StandardCharsets;
 
@@ -195,7 +196,7 @@ public class TransactionList {
                     escapeCsv(transaction.getNote()),
                     escapeCsv(transaction.getCategory()),
                     transaction.getWalletId(),
-                    transaction.getAmount().toPlainString()
+                    transaction.getAmount().setScale(2, RoundingMode.HALF_UP).toPlainString()
             );
 
             lines.add(line);

@@ -135,7 +135,7 @@ public class TransactionMenu extends Menu {
         System.out.println("-------------------------------------------------------------------------------------------------");
 
         for (Transaction transaction : transactions) {
-            System.out.printf("%-12s %-12s %-20.20s %-15s %-12s %12s%n",
+            System.out.printf("%-12s %-12s %-20.20s %-15s %-12s %12.2f%n",
                     transaction.getTransactionId(),
                     transaction.getDate(),
                     transaction.getNote(),
