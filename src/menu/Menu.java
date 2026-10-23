@@ -18,14 +18,9 @@ public abstract class Menu {
     protected abstract String getTitle();
     protected abstract List<String> getOptions();
     protected abstract void handleOption(int option);
-//    protected abstract void onExit();
 
     protected boolean shouldExit() {
         return false;
-    }
-
-    protected String getExitLabel() {
-        return "Back";
     }
 
     private void displayMenu() {
@@ -35,7 +30,7 @@ public abstract class Menu {
         for (int i = 0; i < options.size(); i++) {
             System.out.println((i + 1) + ". " + options.get(i));
         }
-        System.out.println("0. " + getExitLabel());
+        System.out.println("0. Back");
     }
 
     public void runMenu() {
@@ -54,7 +49,5 @@ public abstract class Menu {
                 System.out.println("Invalid choice, please try again.");
             }
         }
-
-//        onExit();
     }
 }
