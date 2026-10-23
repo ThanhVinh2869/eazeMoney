@@ -1,5 +1,6 @@
 package login;
 
+import util.InputValidator;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;

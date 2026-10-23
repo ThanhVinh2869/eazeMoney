@@ -1,5 +1,6 @@
 package login;
 
+import wallet.WalletList;
 import java.time.LocalDate;
 
 /**
@@ -16,6 +17,7 @@ public class Account {
     private String currency;
     private LocalDate createdDate;
     private boolean onboardingComplete;
+    private final WalletList walletList;
 
     public Account(String userID, String username, String passwordHash, String salt, String displayName, String currency, LocalDate createdDate, boolean onboardingComplete) {
         this.userID = userID;
@@ -26,6 +28,8 @@ public class Account {
         this.currency = currency;
         this.createdDate = createdDate;
         this.onboardingComplete = onboardingComplete;
+        this.walletList = new WalletList();
+        this.walletList.loadWallets(userID);
     }
 
     /**
@@ -120,6 +124,10 @@ public class Account {
 
     public void setOnboardingComplete(boolean onBoardingComplete) {
         this.onboardingComplete = onBoardingComplete;
+    }
+
+    public WalletList getWalletList() {
+        return walletList;
     }
 
 }
