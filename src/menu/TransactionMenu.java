@@ -80,6 +80,8 @@ public class TransactionMenu extends Menu {
                 }
                 break;
             case 6:
+                handleDisplayTransactions(getTransactionList().getTransactions());
+
                 transactionId = reader.readString("Transaction ID to update: ");
                 if (transactionId != null) {
                     Transaction toBeUpdatedTransaction = transactionList.findTransactionById(transactionId);
@@ -97,6 +99,8 @@ public class TransactionMenu extends Menu {
                 }
                 break;
             case 7:
+                handleDisplayTransactions(getTransactionList().getTransactions());
+
                 transactionId = reader.readString("Transaction ID to delete: ");
                 if (transactionId != null) {
                     try {
