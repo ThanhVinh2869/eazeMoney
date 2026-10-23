@@ -1,7 +1,9 @@
 import login.Account;
 import login.AccountsManager;
+import menu.BudgetMenu;
 import menu.LoginMenu;
 import menu.TransactionMenu;
+import menu.WalletMenu;
 import util.InputReader;
 
 import java.io.IOException;
@@ -51,15 +53,12 @@ public class App {
         }
     }
 
-    private void showLoginMenu() {
-
-    }
-
     private void showDashboardMenu() {
         System.out.println("\n--- Dashboard ---");
         System.out.println("1. Transactions");
         System.out.println("2. Budgets");
-        System.out.println("3. Log out");
+        System.out.println("3. Wallets");
+        System.out.println("4. Log out");
         System.out.println("0. Exit");
 
         int choice = reader.readInt("Choose an option: ");
@@ -70,7 +69,11 @@ public class App {
                 break;
             case 2:
                 showBudgetMenu();
+                break;
             case 3:
+                showWalletMenu();
+                break;
+            case 4:
                 session.logout();
                 break;
             case 0:
@@ -89,6 +92,21 @@ public class App {
     }
 
     private void showBudgetMenu() {
-        System.out.println("\nBudgetMenu to be updated");
+        try {
+            BudgetMenu budgetMenu = new BudgetMenu(session.getUserID(), scanner);
+            budgetMenu.runMenu();
+        } catch (IOException e) {
+            System.out.println("Could not load budgets: " + e.getMessage());
+        }
+    }
+
+    private void showWalletMenu() {
+        Account account = session.getCurrentAccount();
+        if (account == null) {
+            System.out.println("Please log in to manage wallets.");
+            return;
+        }
+        WalletMenu walletMenu = new WalletMenu(scanner, account);
+        walletMenu.runMenu();
     }
 }
