@@ -18,7 +18,7 @@ public class InputReader {
             try {
                 return Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                showError("Invalid int number, try again.");
+                showError("Invalid number, try again.");
             }
         }
     }
@@ -105,7 +105,11 @@ public class InputReader {
 
     public boolean confirm(String question) {
         while (true) {
-            String answer = readString(question + " (y/n): ").toLowerCase();
+            String input = readString(question + " (y/n): ");
+            if (input == null) {
+                return false;
+            }
+            String answer = input.toLowerCase();
 
             if (answer.equals("y") || answer.equals("yes")) {
                 return true;
