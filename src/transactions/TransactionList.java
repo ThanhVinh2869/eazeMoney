@@ -42,6 +42,26 @@ public class TransactionList {
         return true;
     }
 
+    public String nextTransactionId() {
+        int nextNumber = 1;
+        for (Transaction transaction : transactions) {
+            String id = transaction.getTransactionId();
+            if (id.startsWith("t1")) {
+                try {
+                    nextNumber = Math.max(nextNumber, Integer.parseInt(id.substring(2)) + 1);
+                } catch (NumberFormatException ignored) {
+                    // Ignore IDs that do not end in a numeric sequence.
+                }
+            }
+        }
+
+        String nextId = String.format("t1%03d", nextNumber);
+        while (findTransactionById(nextId) != null) {
+            nextId = String.format("t1%03d", ++nextNumber);
+        }
+        return nextId;
+    }
+
     // READ: Retrieve all transactions or one
     public ArrayList<Transaction> getTransactions() {
         return new ArrayList<>(transactions);

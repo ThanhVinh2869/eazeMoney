@@ -68,16 +68,14 @@ public class TransactionMenu extends Menu {
                 }
                 break;
             case 5:
-                transactionId = reader.readString("Transaction ID to find: ");
-                if (transactionId != null) {
-                    Transaction transaction = readTransaction(transactionId);
-                    if (transaction != null) {
-                        try {
-                            handleAddTransaction(transaction);
-                        } catch (IOException e) {
-                            // TODO
-                            System.out.println("Please fix this: " + e.getMessage());
-                        }
+                transactionId = transactionList.nextTransactionId();
+                Transaction transaction = readTransaction(transactionId);
+                if (transaction != null) {
+                    try {
+                        handleAddTransaction(transaction);
+                    } catch (IOException e) {
+                        // TODO
+                        System.out.println("Please fix this: " + e.getMessage());
                     }
                 }
                 break;
