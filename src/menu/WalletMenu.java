@@ -74,7 +74,7 @@ public class WalletMenu extends Menu {
             return;
         }
 
-        Wallet wallet = new Wallet(name, startingBalance);
+        Wallet wallet = new Wallet(wallets.nextWalletId(), name, startingBalance);
         wallets.addWallet(wallet);
         System.out.println("Wallet " + wallet.getWalletId() + " added.");
     }

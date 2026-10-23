@@ -1,5 +1,7 @@
 package wallet;
 
+import budgets.Budget;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,6 +87,21 @@ public class WalletList {
     public void addWallet(Wallet wallet) {
         wallets.add(wallet);
         saveWalletToFile();
+    }
+
+    public String nextWalletId() {
+        int max = 1000;
+        for (Wallet w : wallets) {
+            String id = w.getWalletId();
+            if (id != null && id.length() > 1 && (id.charAt(0) == 'w' || id.charAt(0) == 'W')) {
+                try {
+                    max = Math.max(max, Integer.parseInt(id.substring(1)));
+                } catch (NumberFormatException ignored) {
+                    // non-numeric id, skip it
+                }
+            }
+        }
+        return "w" + (max + 1);
     }
 
     /**

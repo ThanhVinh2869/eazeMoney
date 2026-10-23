@@ -2,8 +2,6 @@ package wallet;
 
 import transactions.TransactionList;
 
-import java.util.UUID;
-
 /** One row of wallets.csv: walletId, walletName, startingBalance. */
 public class Wallet {
 
@@ -11,11 +9,6 @@ public class Wallet {
     private String walletName;
     private double startingBalance;
     private TransactionList transactionList;
-
-    /** Creates a brand-new wallet with a generated id. */
-    public Wallet(String walletName, double startingBalance) {
-        this(UUID.randomUUID().toString(), walletName, startingBalance);
-    }
 
     /** Used when loading an existing wallet from the CSV. */
     public Wallet(String walletId, String walletName, double startingBalance) {
