@@ -41,7 +41,7 @@ public class BudgetMenu extends Menu {
 
     @Override
     protected List<String> getOptions() {
-        return List.of("Add budget", "List budgets", "Update budget", "Delete budget");
+        return List.of("List all budgets", "Add budget", "Update budget", "Delete budget");
     }
 
     @Override
@@ -49,10 +49,10 @@ public class BudgetMenu extends Menu {
         try {
             switch (option) {
                 case 1:
-                    handleAddBudget();
+                    handleListBudgets();
                     break;
                 case 2:
-                    handleListBudgets();
+                    handleAddBudget();
                     break;
                 case 3:
                     handleUpdateBudget();
@@ -71,31 +71,6 @@ public class BudgetMenu extends Menu {
     }
 
     // ------------------------------------------------------------------ actions
-
-    private void handleAddBudget() throws IOException {
-        System.out.println("\n--- Add budget (type 'cancel' at any prompt to go back) ---");
-
-        String category = promptRequired("Category (e.g. FOOD): ");
-        if (budgetList.categoryAlreadyBudgeted(category)) {
-            Budget existing = budgetList.findByCategory(category);
-            System.out.println("A budget for " + Budget.normalize(category) + " already exists ("
-                    + existing.getBudgetId() + " - " + existing.getBudgetName()
-                    + "). Update that one instead.");
-            return;
-        }
-
-        String name = promptRequired("Budget name: ");
-        BigDecimal amount = promptAmount("Limit amount: ", null);
-        String period = promptPeriod("Period " + periodsHint() + ": ", null);
-
-        Budget budget = new Budget(null, name, amount, period, category);
-        if (budgetList.create(budget)) {
-            budgetList.save();
-            System.out.println("Budget " + budget.getBudgetId() + " added.");
-        } else {
-            System.out.println("A budget for " + budget.getCategory() + " already exists. Budget not added.");
-        }
-    }
 
     private void handleListBudgets() throws IOException {
         List<Budget> budgets = budgetList.getBudgets();
@@ -122,6 +97,31 @@ public class BudgetMenu extends Menu {
                     b.getBudgetAmount().setScale(2, RoundingMode.HALF_UP).toPlainString(),
                     spent.setScale(2, RoundingMode.HALF_UP).toPlainString(),
                     used, status);
+        }
+    }
+
+    private void handleAddBudget() throws IOException {
+        System.out.println("\n--- Add budget (type 'cancel' at any prompt to go back) ---");
+
+        String category = promptRequired("Category (e.g. FOOD): ");
+        if (budgetList.categoryAlreadyBudgeted(category)) {
+            Budget existing = budgetList.findByCategory(category);
+            System.out.println("A budget for " + Budget.normalize(category) + " already exists ("
+                    + existing.getBudgetId() + " - " + existing.getBudgetName()
+                    + "). Update that one instead.");
+            return;
+        }
+
+        String name = promptRequired("Budget name: ");
+        BigDecimal amount = promptAmount("Limit amount: ", null);
+        String period = promptPeriod("Period " + periodsHint() + ": ", null);
+
+        Budget budget = new Budget(null, name, amount, period, category);
+        if (budgetList.create(budget)) {
+            budgetList.save();
+            System.out.println("Budget " + budget.getBudgetId() + " added.");
+        } else {
+            System.out.println("A budget for " + budget.getCategory() + " already exists. Budget not added.");
         }
     }
 
