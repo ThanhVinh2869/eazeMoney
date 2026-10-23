@@ -1,4 +1,7 @@
-package budgets;
+package menu;
+
+import budgets.Budget;
+import budgets.BudgetList;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -13,70 +16,63 @@ import java.util.Scanner;
  *     new BudgetMenu(userId, scanner).run();
  * run() returns when the user chooses "Back".
  */
-public class BudgetMenu {
+public class BudgetMenu extends Menu {
 
     private final BudgetList budgetList;
-    private final Scanner scanner;
 
     /**
      * Loads data/&lt;userId&gt;/budgets.csv. Pass the App's existing Scanner so System.in
      * isn't wrapped twice.
      */
     public BudgetMenu(String userId, Scanner scanner) throws IOException {
+        super(scanner);
         this.budgetList = new BudgetList(userId);
         this.budgetList.load();
-        this.scanner = scanner;
     }
 
     public BudgetList getBudgetList() {
         return budgetList;
     }
 
-    /** Shows the budget menu until the user goes back (or input ends). */
-    public void run() {
-        while (true) {
-            System.out.println("\n===== BUDGETS =====");
-            System.out.println("1. Add budget");
-            System.out.println("2. List budgets");
-            System.out.println("3. Update budget");
-            System.out.println("4. Delete budget");
-            System.out.println("0. Back to dashboard");
+    @Override
+    protected String getTitle() {
+        return "BUDGETS";
+    }
 
-            String choice = prompt("Choose an option: ");
-            if (choice == null) {
-                return;
-            }
+    @Override
+    protected List<String> getOptions() {
+        return List.of("Add budget", "List budgets", "Update budget", "Delete budget");
+    }
 
-            try {
-                switch (choice) {
-                    case "1":
-                        addBudget();
-                        break;
-                    case "2":
-                        listBudgets();
-                        break;
-                    case "3":
-                        updateBudget();
-                        break;
-                    case "4":
-                        deleteBudget();
-                        break;
-                    case "0":
-                        return;
-                    default:
-                        System.out.println("Please choose a valid option.");
-                }
-            } catch (IOException e) {
-                System.out.println("Could not read or save budget data: " + e.getMessage());
-            } catch (InputCancelled e) {
-                System.out.println("Cancelled.");
+    @Override
+    protected void handleOption(int option) {
+        try {
+            switch (option) {
+                case 1:
+                    handleAddBudget();
+                    break;
+                case 2:
+                    handleListBudgets();
+                    break;
+                case 3:
+                    handleUpdateBudget();
+                    break;
+                case 4:
+                    handleDeleteBudget();
+                    break;
+                default:
+                    System.out.println("Please choose a valid option.");
             }
+        } catch (IOException e) {
+            System.out.println("Could not read or save budget data: " + e.getMessage());
+        } catch (InputCancelled e) {
+            System.out.println("Cancelled.");
         }
     }
 
     // ------------------------------------------------------------------ actions
 
-    private void addBudget() throws IOException {
+    private void handleAddBudget() throws IOException {
         System.out.println("\n--- Add budget (type 'cancel' at any prompt to go back) ---");
 
         String category = promptRequired("Category (e.g. FOOD): ");
@@ -101,7 +97,7 @@ public class BudgetMenu {
         }
     }
 
-    private void listBudgets() throws IOException {
+    private void handleListBudgets() throws IOException {
         List<Budget> budgets = budgetList.getBudgets();
 
         System.out.println("\n===== YOUR BUDGETS =====");
@@ -118,7 +114,7 @@ public class BudgetMenu {
             BigDecimal spent = budgetList.getSpent(b);
             String used = b.getBudgetAmount().signum() == 0 ? "-"
                     : spent.multiply(BigDecimal.valueOf(100))
-                           .divide(b.getBudgetAmount(), 0, RoundingMode.HALF_UP) + "%";
+                    .divide(b.getBudgetAmount(), 0, RoundingMode.HALF_UP) + "%";
             String status = budgetList.isExceeded(b) ? "EXCEEDED" : "OK";
 
             System.out.printf("%-8s %-22.22s %-16.16s %-8s %10s %10s %6s  %s%n",
@@ -129,7 +125,7 @@ public class BudgetMenu {
         }
     }
 
-    private void updateBudget() throws IOException {
+    private void handleUpdateBudget() throws IOException {
         Budget existing = promptExistingBudget("Budget ID to update: ");
         if (existing == null) {
             return;
@@ -165,7 +161,7 @@ public class BudgetMenu {
         }
     }
 
-    private void deleteBudget() throws IOException {
+    private void handleDeleteBudget() throws IOException {
         Budget existing = promptExistingBudget("Budget ID to delete: ");
         if (existing == null) {
             return;
@@ -225,7 +221,7 @@ public class BudgetMenu {
     private BigDecimal promptAmount(String message, BigDecimal currentValue) {
         while (true) {
             String input = currentValue == null ? promptRequired(message)
-                                                : promptOptional(message, currentValue.toPlainString());
+                    : promptOptional(message, currentValue.toPlainString());
             try {
                 BigDecimal amount = new BigDecimal(input.replace("$", "").replace(",", ""));
                 if (amount.signum() <= 0) {
@@ -245,7 +241,7 @@ public class BudgetMenu {
     private String promptPeriod(String message, String currentValue) {
         while (true) {
             String input = currentValue == null ? promptRequired(message)
-                                                : promptOptional(message, currentValue);
+                    : promptOptional(message, currentValue);
             String normalized = Budget.normalize(input);
             for (String valid : Budget.VALID_PERIODS) {
                 if (valid.equals(normalized) || valid.startsWith(normalized) && normalized.length() == 1) {
@@ -261,7 +257,7 @@ public class BudgetMenu {
             System.out.println("No budgets yet.");
             return null;
         }
-        listBudgets();
+        handleListBudgets();
         String id = promptRequired(message);
         Budget budget = budgetList.findById(id);
         if (budget == null) {
