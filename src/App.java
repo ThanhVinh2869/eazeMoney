@@ -1,8 +1,16 @@
-import budgets.BudgetMenu;
-import dashboard.DashboardMenu;
-import login.LoginMenu;
-import transactions.TransactionMenu;
+import login.Account;
+import login.AccountsManager;
+import dashboard.DashboardServices;
+import menu.BudgetMenu;
+import menu.LoginMenu;
+import menu.TransactionMenu;
+import menu.WalletMenu;
+import util.InputReader;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 /**
@@ -10,7 +18,9 @@ import java.util.Scanner;
  */
 public class App {
     private final Scanner scanner = new Scanner(System.in);
-    private Class<?> activeMenu = LoginMenu.class;
+    private final Session session = new Session();
+    private final InputReader reader = new InputReader(scanner);
+    private boolean running = true;
 
     public static void main(String[] args) {
         new App().run();
@@ -21,98 +31,95 @@ public class App {
         System.out.println("                 [Eaze Money]");
         System.out.println("==================================================");
 
-        while (activeMenu != null) {
-            if (activeMenu == LoginMenu.class) {
-                showLoginMenu();
-            } else if (activeMenu == DashboardMenu.class) {
-                showDashboardMenu();
-            } else if (activeMenu == TransactionMenu.class) {
-                showTransactionMenu();
-            } else if (activeMenu == BudgetMenu.class) {
-                showBudgetMenu();
+        try {
+            LoginMenu loginMenu = new LoginMenu(scanner, new AccountsManager());
+            while (running) {
+                if (session.isLoggedIn()) {
+                    showDashboardMenu();
+                } else {
+                    loginMenu.runMenu();
+                    Account account = loginMenu.getCurrentAccount();
+                    if (account == null) {
+                        running = false;
+                    } else {
+                        session.login(account);
+                    }
+                }
             }
-        }
-
-        System.out.println("Goodbye!");
-        scanner.close();
-    }
-
-    private void showLoginMenu() {
-        System.out.println("\nLoginMenu");
-        System.out.println("1. Log in");
-        System.out.println("2. Register");
-        System.out.println("0. Exit");
-
-        switch (readChoice()) {
-            case 1:
-            case 2:
-                activeMenu = DashboardMenu.class;
-                break;
-            case 0:
-                activeMenu = null;
-                break;
-            default:
-                System.out.println("Please choose a valid option.");
+        } catch (IOException e) {
+            System.out.println("Could not load accounts: " + e.getMessage());
+        } finally {
+            System.out.println("Goodbye!");
+            scanner.close();
         }
     }
 
     private void showDashboardMenu() {
-        System.out.println("\nDashboardMenu");
-        System.out.println("1. Transactions");
-        System.out.println("2. Budgets");
-        System.out.println("3. Log out");
+        System.out.println("\n--- Dashboard ---");
+        System.out.println("1. Summary");
+        System.out.println("2. Transactions");
+        System.out.println("3. Budgets");
+        System.out.println("4. Wallets");
+        System.out.println("5. Log out");
         System.out.println("0. Exit");
 
-        switch (readChoice()) {
+        int choice = reader.readInt("Choose an option: ");
+
+        switch (choice) {
             case 1:
-                activeMenu = TransactionMenu.class;
+                showSummary();
                 break;
             case 2:
-                activeMenu = BudgetMenu.class;
+                showTransactionMenu();
                 break;
             case 3:
-                activeMenu = LoginMenu.class;
+                showBudgetMenu();
+                break;
+            case 4:
+                showWalletMenu();
+                break;
+            case 5:
+                session.logout();
                 break;
             case 0:
-                activeMenu = null;
+                running = false;
                 break;
-            default:
-                System.out.println("Please choose a valid option.");
+        }
+    }
+
+    private void showSummary() {
+        try {
+            new DashboardServices(session.getUserID()).displaySummaries();
+        } catch (IOException e) {
+            System.out.println("Could not display dashboard summary: " + e.getMessage());
         }
     }
 
     private void showTransactionMenu() {
-        System.out.println("\nTransactionMenu");
-        System.out.println("0. Back to dashboard");
-
-        if (readChoice() == 0) {
-            activeMenu = DashboardMenu.class;
-        } else {
-            System.out.println("Please choose a valid option.");
+        try {
+            TransactionMenu transactionMenu = new TransactionMenu(scanner, session.getUserID());
+            transactionMenu.runMenu();
+        } catch (IOException e) {
+            System.out.println("Could not load transactions: " + e.getMessage());
         }
     }
 
     private void showBudgetMenu() {
-        System.out.println("\nBudgetMenu");
-        System.out.println("0. Back to dashboard");
-
-        if (readChoice() == 0) {
-            activeMenu = DashboardMenu.class;
-        } else {
-            System.out.println("Please choose a valid option.");
+        try {
+            BudgetMenu budgetMenu = new BudgetMenu(session.getUserID(), scanner);
+            budgetMenu.runMenu();
+        } catch (IOException e) {
+            System.out.println("Could not load budgets: " + e.getMessage());
         }
     }
 
-    private int readChoice() {
-        if (!scanner.hasNextLine()) {
-            activeMenu = null;
-            return -1;
+    private void showWalletMenu() {
+        Account account = session.getCurrentAccount();
+        if (account == null) {
+            System.out.println("Please log in to manage wallets.");
+            return;
         }
-
-        try {
-            return Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+        WalletMenu walletMenu = new WalletMenu(scanner, account);
+        walletMenu.runMenu();
     }
 }
