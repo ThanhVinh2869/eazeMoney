@@ -1,5 +1,6 @@
 import login.Account;
 import login.AccountsManager;
+import dashboard.DashboardServices;
 import menu.BudgetMenu;
 import menu.LoginMenu;
 import menu.TransactionMenu;
@@ -55,30 +56,42 @@ public class App {
 
     private void showDashboardMenu() {
         System.out.println("\n--- Dashboard ---");
-        System.out.println("1. Transactions");
-        System.out.println("2. Budgets");
-        System.out.println("3. Wallets");
-        System.out.println("4. Log out");
+        System.out.println("1. Summary");
+        System.out.println("2. Transactions");
+        System.out.println("3. Budgets");
+        System.out.println("4. Wallets");
+        System.out.println("5. Log out");
         System.out.println("0. Exit");
 
         int choice = reader.readInt("Choose an option: ");
 
         switch (choice) {
             case 1:
-                showTransactionMenu();
+                showSummary();
                 break;
             case 2:
-                showBudgetMenu();
+                showTransactionMenu();
                 break;
             case 3:
-                showWalletMenu();
+                showBudgetMenu();
                 break;
             case 4:
+                showWalletMenu();
+                break;
+            case 5:
                 session.logout();
                 break;
             case 0:
                 running = false;
                 break;
+        }
+    }
+
+    private void showSummary() {
+        try {
+            new DashboardServices(session.getUserID()).displaySummaries();
+        } catch (IOException e) {
+            System.out.println("Could not display dashboard summary: " + e.getMessage());
         }
     }
 
